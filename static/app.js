@@ -43,7 +43,8 @@ const elements = {
     tweetTextarea: document.getElementById('tweet-textarea'),
     charCount: document.getElementById('char-count'),
     charProgressCircle: document.getElementById('char-progress-circle'),
-    sendTweetBtn: document.getElementById('send-tweet-btn')
+    sendTweetBtn: document.getElementById('send-tweet-btn'),
+    exportCsvBtn: document.getElementById('export-csv-btn')
 };
 
 // Initialize character progress ring constants
@@ -231,6 +232,12 @@ function renderReleaseList() {
                     <span class="card-date">${item.date}</span>
                 </div>
                 <div class="card-actions">
+                    <button class="card-btn card-btn-copy" title="Copy to clipboard" data-id="${item.id}">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                    </button>
                     <button class="card-btn card-btn-tweet" title="Tweet this update" data-id="${item.id}">
                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -251,6 +258,10 @@ function renderReleaseList() {
         // Add event listener to the specific Tweet button
         const tweetBtn = card.querySelector('.card-btn-tweet');
         tweetBtn.addEventListener('click', () => openTweetModal(item));
+        
+        // Add event listener to the specific Copy button
+        const copyBtn = card.querySelector('.card-btn-copy');
+        copyBtn.addEventListener('click', () => copyToClipboard(item, copyBtn));
         
         elements.releaseList.appendChild(card);
     });
@@ -346,6 +357,66 @@ function sendTweet() {
     closeTweetModal();
 }
 
+// Copy single release note plain text to clipboard
+function copyToClipboard(item, btnElement) {
+    const text = `BigQuery Release Note [${item.date} - ${item.type}]:\n\n${item.content_text}\n\nRead more: ${item.link}`;
+    navigator.clipboard.writeText(text).then(() => {
+        // Visual feedback
+        const originalHTML = btnElement.innerHTML;
+        btnElement.innerHTML = `
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        `;
+        btnElement.title = "Copied!";
+        btnElement.style.color = "#10b981";
+        
+        setTimeout(() => {
+            btnElement.innerHTML = originalHTML;
+            btnElement.title = "Copy to clipboard";
+            btnElement.style.color = "";
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert("Failed to copy to clipboard.");
+    });
+}
+
+// Export current filtered/sorted list to CSV file
+function exportToCSV() {
+    if (state.filteredReleases.length === 0) {
+        alert("No release notes found to export.");
+        return;
+    }
+    
+    const headers = ["Date", "Type", "Content Text", "Link"];
+    const rows = state.filteredReleases.map(item => [
+        item.date,
+        item.type,
+        item.content_text.replace(/"/g, '""'), // Escape double quotes
+        item.link
+    ]);
+    
+    const csvContent = [
+        headers.join(","),
+        ...rows.map(row => row.map(val => `"${val}"`).join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    
+    const now = new Date();
+    const dateString = now.toISOString().split('T')[0];
+    const categoryName = state.activeType.toLowerCase().replace(/\s+/g, '_');
+    link.setAttribute("download", `bigquery_releases_${categoryName}_${dateString}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Event Listeners
 function setupEventListeners() {
     // Refresh feed
@@ -396,6 +467,11 @@ function setupEventListeners() {
     
     // Share Tweet
     elements.sendTweetBtn.addEventListener('click', sendTweet);
+    
+    // Export CSV
+    if (elements.exportCsvBtn) {
+        elements.exportCsvBtn.addEventListener('click', exportToCSV);
+    }
     
     // Escape key modal dismiss
     document.addEventListener('keydown', (e) => {
