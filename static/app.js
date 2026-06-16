@@ -44,7 +44,9 @@ const elements = {
     charCount: document.getElementById('char-count'),
     charProgressCircle: document.getElementById('char-progress-circle'),
     sendTweetBtn: document.getElementById('send-tweet-btn'),
-    exportCsvBtn: document.getElementById('export-csv-btn')
+    exportCsvBtn: document.getElementById('export-csv-btn'),
+    themeToggle: document.getElementById('theme-toggle'),
+    themeLabel: document.getElementById('theme-label')
 };
 
 // Initialize character progress ring constants
@@ -479,10 +481,34 @@ function setupEventListeners() {
             closeTweetModal();
         }
     });
+
+    // Theme Toggle Change
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('light-theme');
+                elements.themeLabel.textContent = "Light Mode";
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.remove('light-theme');
+                elements.themeLabel.textContent = "Dark Mode";
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    }
 }
 
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    
+    // Load saved theme state
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light' && elements.themeToggle) {
+        elements.themeToggle.checked = true;
+        document.body.classList.add('light-theme');
+        elements.themeLabel.textContent = "Light Mode";
+    }
+    
     fetchReleaseNotes();
 });

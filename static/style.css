@@ -39,6 +39,124 @@
     --transition-normal: 0.25s ease;
 }
 
+/* Light Theme Variables */
+body.light-theme {
+    --bg-main: #f1f5f9;
+    --bg-darker: #cbd5e1;
+    --bg-card: rgba(255, 255, 255, 0.75);
+    --bg-card-hover: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color-hover: rgba(2, 132, 199, 0.3);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    /* Brand Gradients & Colors */
+    --accent-start: #0284c7;
+    --accent-end: #0369a1;
+    --accent-hover: #075985;
+    
+    /* Category Colors */
+    --color-feature: #047857;
+    --color-feature-bg: rgba(4, 120, 87, 0.1);
+    --color-issue: #b45309;
+    --color-issue-bg: rgba(180, 83, 9, 0.1);
+    --color-deprecation: #b91c1c;
+    --color-deprecation-bg: rgba(185, 28, 28, 0.1);
+    --color-change: #6d28d9;
+    --color-change-bg: rgba(109, 40, 217, 0.1);
+    --color-general: #4b5563;
+    --color-general-bg: rgba(75, 85, 99, 0.1);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.06);
+    --shadow-glow: 0 0 15px rgba(2, 132, 199, 0.15);
+}
+
+body.light-theme {
+    background: radial-gradient(circle at top right, #e0f2fe, var(--bg-main) 60%);
+}
+
+/* Theme Toggle Slider */
+.theme-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    height: 38px;
+}
+
+body.light-theme .theme-switch-container {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.theme-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 75px;
+    text-align: right;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1e293b;
+    transition: .3s;
+    border-radius: 22px;
+}
+
+body.light-theme .theme-slider {
+    background-color: #cbd5e1;
+}
+
+.theme-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+body.light-theme .theme-slider:before {
+    background-color: #0f172a;
+}
+
+input:checked + .theme-slider {
+    background-color: #0284c7;
+}
+
+input:checked + .theme-slider:before {
+    transform: translateX(20px);
+}
+
 /* Reset & Global Styles */
 * {
     margin: 0;
